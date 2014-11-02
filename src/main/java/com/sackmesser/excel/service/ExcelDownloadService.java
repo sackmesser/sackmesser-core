@@ -13,11 +13,11 @@ import java.util.List;
  */
 
 @Service
-public class ExcelDownloadService implements IFileDownloadService{
+public class ExcelDownloadService<T> implements IFileDownloadService<T>{
 
     @Override
-    public byte[] writeToFile(List<Object> objects) throws Exception {
-        DefaultExcelItemWriter<Object> itemWriter = new DefaultExcelItemWriter<>();
+    public byte[] writeToFile(List<T> objects) throws Exception {
+        DefaultExcelItemWriter<T> itemWriter = new DefaultExcelItemWriter<>();
         CustomByteArrayResource resource = new CustomByteArrayResource();
         itemWriter.setResource(resource);
         itemWriter.write(objects);

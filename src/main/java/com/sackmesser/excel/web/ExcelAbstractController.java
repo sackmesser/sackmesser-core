@@ -4,9 +4,9 @@ import com.sackmesser.excel.domain.ResultObject;
 import com.sackmesser.excel.exceptions.NoDataFoundException;
 import com.sackmesser.excel.service.IFileDownloadService;
 import com.sackmesser.excel.service.IFileUploadService;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ExcelAbstractController {
+public abstract class ExcelAbstractController<T> {
 
     @RequestMapping(value = "/excel/upload", method = RequestMethod.GET)
     public
@@ -63,9 +63,9 @@ public abstract class ExcelAbstractController {
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE )
     @ResponseBody public HttpEntity<byte[]> export () throws Exception {
         Map filter = new HashMap();
-        List<Object> dataToSave = filterDataToDownload(filter);
+        List<T> dataToSave = filterDataToDownload(filter);
         if(!CollectionUtils.isEmpty(dataToSave)){
-            byte[] documentBody = getFileDownloadService().writeToFile(filterDataToDownload(filter));
+            byte[] fileBytes = getFileDownloadService().writeToFile(filterDataToDownload(filter));
             SimpleDateFormat formatter = new SimpleDateFormat("MMddyyyy_hhmmssSSS");
             String fileName = "excelExport_" + formatter.format(new Date()) + ".xlsx";
 
@@ -73,8 +73,9 @@ public abstract class ExcelAbstractController {
             header.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             header.set("Content-Disposition",
                     "attachment; filename=" + fileName);
-            header.setContentLength(documentBody.length);
-            return new HttpEntity<byte[]>(documentBody, header);
+            header.setContentLength(fileBytes.length);
+
+            return new HttpEntity(fileBytes, header);
         }
         throw new NoDataFoundException();
     }
@@ -87,6 +88,6 @@ public abstract class ExcelAbstractController {
      * Implement this method only when download feature will be used
      *  otherwise, it may return null
     */
-    protected abstract List<Object> filterDataToDownload(Map filter);
+    protected abstract List<T> filterDataToDownload(Map filter);
 
 }

@@ -12,6 +12,6 @@ import java.util.List;
  * Date: 09/10/14
  * Time: 10:39
  */
-public interface IFileDownloadService {
-    byte[] writeToFile(List<Object> objects) throws Exception;
+public interface IFileDownloadService<T> {
+    byte[] writeToFile(List<T> objects) throws Exception;
 }
