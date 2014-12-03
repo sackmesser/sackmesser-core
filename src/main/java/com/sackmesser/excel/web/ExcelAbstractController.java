@@ -66,8 +66,7 @@ public abstract class ExcelAbstractController<T> {
         List<T> dataToSave = filterDataToDownload(filter);
         if(!CollectionUtils.isEmpty(dataToSave)){
             byte[] fileBytes = getFileDownloadService().writeToFile(filterDataToDownload(filter));
-            SimpleDateFormat formatter = new SimpleDateFormat("MMddyyyy_hhmmssSSS");
-            String fileName = "excelExport_" + formatter.format(new Date()) + ".xlsx";
+            String fileName = getFileName();
 
             HttpHeaders header = new HttpHeaders();
             header.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -78,6 +77,13 @@ public abstract class ExcelAbstractController<T> {
             return new HttpEntity(fileBytes, header);
         }
         throw new NoDataFoundException();
+    }
+
+
+    protected String getFileName(){
+        SimpleDateFormat formatter = new SimpleDateFormat("MMddyyyy_hhmmssSSS");
+        String fileName = formatter.format(new Date()) + ".xlsx";
+        return fileName;
     }
 
 
