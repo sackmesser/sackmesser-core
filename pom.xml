@@ -35,12 +35,8 @@
 
     <repositories>
         <repository>
-            <id>sackmesser-mvn-repo</id>
-            <url>https://raw.github.com/sackmesser/mvn-repo/master</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
+            <id>spring-gemstone-releases</id>
+            <url>http://repo.springsource.org/gemstone-release-cache/</url>
         </repository>
     </repositories>
 
@@ -182,7 +178,6 @@
                 </plugins>
             </build>
         </profile>
-
 
     </profiles>
 </project>
