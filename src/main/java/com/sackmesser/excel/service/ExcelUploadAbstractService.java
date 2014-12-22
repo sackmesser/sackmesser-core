@@ -26,19 +26,19 @@ import java.util.List;
 @Service
 @Slf4j
 public abstract class ExcelUploadAbstractService<E> implements IFileUploadService<E> {
-    private Class<E> classType;
-    private RowMapper<E> rowMapper;
-    private int linesToSkip = 1;
+    protected Class<E> classType;
+    protected RowMapper<E> rowMapper;
+    protected int linesToSkip = 1;
 
-    public ExcelUploadAbstractService(Class<E> classType){
+    public ExcelUploadAbstractService(Class<E> classType) {
         this.classType = classType;
     }
 
-    public void setRowMapper(RowMapper<E> rowMapper){
+    public void setRowMapper(RowMapper<E> rowMapper) {
         this.rowMapper = rowMapper;
     }
 
-    public void setLinesToSkip(int linesToSkip){
+    public void setLinesToSkip(int linesToSkip) {
         this.linesToSkip = linesToSkip;
     }
 
@@ -50,30 +50,31 @@ public abstract class ExcelUploadAbstractService<E> implements IFileUploadServic
         List<E> list = new ArrayList<>();
         List<ErrorMessage> errors = new ArrayList<>();
         do {
-            try{
+            try {
                 row = itemReader.read();
-                if (row != null){
+                if (row != null) {
                     list.add(row);
                 }
-            }catch(RuntimeException e){
-                errors.add(new ErrorMessage(e.getCause().toString(), itemReader.getCurrentRowIndex()+ 1));
+            } catch (RuntimeException e) {
+                errors.add(new ErrorMessage(e.getCause().toString(), itemReader.getCurrentRowIndex() + 1));
             }
         } while (row != null);
 
-        if(errors.isEmpty()){
+        if (errors.isEmpty()) {
             process(list);
         }
         ResultObject resultObject = createResultObject(list, errors);
         return resultObject;
     }
 
-    private PoiItemReader<E> configureItemReader(InputStream inputStream) throws Exception {
+    protected PoiItemReader<E> configureItemReader(InputStream inputStream) throws Exception {
         InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
         PoiItemReader<E> itemReader = new PoiItemReader<>();
         itemReader.setLinesToSkip(linesToSkip);
         itemReader.setResource(inputStreamResource);
-        if(rowMapper == null){
+        if (rowMapper == null) {
             rowMapper = new DefaultRowMapper<>(classType);
+            log.info("Using: new DefaultRowMapper({}.class)", classType.getName());
         }
         itemReader.setRowMapper(rowMapper);
 
