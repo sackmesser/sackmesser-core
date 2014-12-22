@@ -5,6 +5,7 @@ import com.sackmesser.excel.domain.ResultObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.excel.RowCallbackHandler;
+import org.springframework.batch.item.excel.RowMapper;
 import org.springframework.batch.item.excel.Sheet;
 import org.springframework.batch.item.excel.mapping.DefaultRowMapper;
 import org.springframework.batch.item.excel.poi.PoiItemReader;
@@ -26,9 +27,19 @@ import java.util.List;
 @Slf4j
 public abstract class ExcelUploadAbstractService<E> implements IFileUploadService<E> {
     private Class<E> classType;
+    private RowMapper<E> rowMapper;
+    private int linesToSkip = 1;
 
     public ExcelUploadAbstractService(Class<E> classType){
         this.classType = classType;
+    }
+
+    public void setRowMapper(RowMapper<E> rowMapper){
+        this.rowMapper = rowMapper;
+    }
+
+    public void setLinesToSkip(int linesToSkip){
+        this.linesToSkip = linesToSkip;
     }
 
     @Override
@@ -59,9 +70,12 @@ public abstract class ExcelUploadAbstractService<E> implements IFileUploadServic
     private PoiItemReader<E> configureItemReader(InputStream inputStream) throws Exception {
         InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
         PoiItemReader<E> itemReader = new PoiItemReader<>();
-        itemReader.setLinesToSkip(1); // First line is skipped
+        itemReader.setLinesToSkip(linesToSkip);
         itemReader.setResource(inputStreamResource);
-        itemReader.setRowMapper(new DefaultRowMapper(classType));
+        if(rowMapper == null){
+            rowMapper = new DefaultRowMapper<>(classType);
+        }
+        itemReader.setRowMapper(rowMapper);
 
         itemReader.setSkippedRowsCallback(new RowCallbackHandler() {
             public void handleRow(final Sheet sheet, final String[] row) {
