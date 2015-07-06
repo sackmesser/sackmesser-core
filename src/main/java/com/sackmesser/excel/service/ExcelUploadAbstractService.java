@@ -3,6 +3,7 @@ package com.sackmesser.excel.service;
 import com.sackmesser.excel.domain.ErrorMessage;
 import com.sackmesser.excel.domain.ResultObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.excel.RowCallbackHandler;
 import org.springframework.batch.item.excel.RowMapper;
@@ -56,7 +57,7 @@ public abstract class ExcelUploadAbstractService<E> implements IFileUploadServic
                     list.add(row);
                 }
             } catch (RuntimeException e) {
-                errors.add(new ErrorMessage(e.getCause().toString(), itemReader.getCurrentRowIndex() + 1));
+                errors.add(new ErrorMessage(ExceptionUtils.getRootCauseMessage(e), itemReader.getCurrentRowIndex() + 1));
             }
         } while (row != null);
 
